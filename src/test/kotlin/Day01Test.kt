@@ -5,24 +5,24 @@ internal class Day01Test {
 
     @Test
     fun `should find the maximum calories carried by an elf`() {
-        assertEquals(CalorieCounting.findMaxCalories(calories), 24000)
+        assertEquals(24000, CalorieCounting.findMaxCalories(calories))
     }
 
     @Test
     fun `should find the sum of the top 3 calories carried by an elves`() {
-        assertEquals(CalorieCounting.findSumOfTopThreeMaxCalories(calories), 45000)
+        assertEquals(45000, CalorieCounting.findSumOfTopThreeMaxCalories(calories))
     }
 
     @Test
     fun `solve day 1 part 1`() {
         val max = CalorieCounting.findMaxCalories(input)
-        assertEquals(max, 74711)
+        assertEquals(74711, max)
     }
 
     @Test
     fun `solve day 1 part 2`() {
         val sum = CalorieCounting.findSumOfTopThreeMaxCalories(input)
-        assertEquals(sum, 209481)
+        assertEquals(209481, sum)
     }
 
     companion object {
