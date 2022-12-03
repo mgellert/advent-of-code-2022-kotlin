@@ -1,31 +1,34 @@
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
-import kotlin.test.assertEquals
 
 internal class Day02Test {
 
-    private val testInput = listOf(Pair("A", "Y"), Pair("B", "X"), Pair("C", "Z"))
-
     @Test
     fun `should calculate total score if the second column represents player hand`() {
-        val score = scoreAllRounds(testInput)
+        val score = RockPaperScissors.scoreAllRounds(strategyGuide)
         assertEquals(15, score)
     }
 
     @Test
     fun `solve day 2 part 1`() {
-        val score = scoreAllRounds(readInput())
+        val score = RockPaperScissors.scoreAllRounds(puzzleInput)
         assertEquals(10718, score)
     }
 
     @Test
     fun `should calculate total score if the second column represents desired outcome`() {
-        val score = calculateHandAndScoreAllRounds(testInput)
+        val score = RockPaperScissors.calculateHandAndScoreAllRounds(strategyGuide)
         assertEquals(12, score)
     }
 
     @Test
     fun `solve solve day 2 part 2`() {
-        val score = calculateHandAndScoreAllRounds(readInput())
+        val score = RockPaperScissors.calculateHandAndScoreAllRounds(puzzleInput)
         assertEquals(14652, score)
+    }
+
+    companion object {
+        private val puzzleInput by lazy { RockPaperScissors.readInput() }
+        private val strategyGuide = listOf(Pair("A", "Y"), Pair("B", "X"), Pair("C", "Z"))
     }
 }
