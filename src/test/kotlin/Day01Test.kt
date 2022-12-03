@@ -15,18 +15,19 @@ internal class Day01Test {
 
     @Test
     fun `solve day 1 part 1`() {
-        val max = CalorieCounting.findMaxCalories(input)
+        val max = CalorieCounting.findMaxCalories(puzzleInput)
         assertEquals(74711, max)
     }
 
     @Test
     fun `solve day 1 part 2`() {
-        val sum = CalorieCounting.findSumOfTopThreeMaxCalories(input)
+        val sum = CalorieCounting.findSumOfTopThreeMaxCalories(puzzleInput)
         assertEquals(209481, sum)
     }
 
     companion object {
-        private val input = CalorieCounting.readInput()
+        private val puzzleInput by lazy { CalorieCounting.readPuzzleInput() }
+
         private val calories = listOf(
             listOf(1000, 2000, 3000),
             listOf(4000),
