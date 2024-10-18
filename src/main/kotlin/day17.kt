@@ -3,39 +3,56 @@ import java.io.File
 object PyroclasticFlow : Solution {
 
     fun heightOfRocks(jetPattern: String, maxShapes: Long): Long {
-        val moveItr = moveGenerator(jetPattern).iterator()
         var shapeCounter = 0L
-        val resting = mutableSetOf<Point>()
+        var moveCounter = 0L
+        var highestLine = 0L
+        val restingRocks = mutableSetOf<Point>()
+        val patterns = mutableMapOf<String, Pair<Long, Long>>()
 
         while (shapeCounter < maxShapes) {
-            var rock = nextShape(shapeCounter++, Point(2, 4 + (resting.maxOfOrNull { it.y } ?: 0)))
+            var rock = nextShape(shapeCounter++, Point(2, 4 + (restingRocks.maxOfOrNull { it.y } ?: highestLine)))
 
             while (true) {
-                val move = moveItr.next()
+                val move = nextMove(moveCounter++, jetPattern)
                 rock = when (move) {
-                    '<' -> shiftLeft(rock, resting)
-                    '>' -> shiftRight(rock, resting)
+                    '<' -> shiftLeft(rock, restingRocks)
+                    '>' -> shiftRight(rock, restingRocks)
                     else -> throw IllegalStateException()
                 }
-                val (hasFallen, r) = fall(rock, resting)
+                val (hasFallen, r) = fall(rock, restingRocks, highestLine)
                 rock = r
                 if (!hasFallen) break
             }
 
-            resting.addAll(rock)
-        }
+            restingRocks.addAll(rock)
 
-        return resting.maxOf { it.y }
-    }
-
-    private fun moveGenerator(jetPattern: String) = sequence {
-        var i = 0
-        while (true) {
-            yield(jetPattern[i++])
-            if (i >= jetPattern.length) {
-                i -= jetPattern.length
+            val fullLines: Map<Long, List<Point>> =
+                restingRocks.groupBy { it.y }.filter { (_, points) -> points.size == 7 }
+            if (fullLines.isNotEmpty()) {
+                highestLine = fullLines.keys.max()
+                restingRocks.removeAll { it.y <= highestLine }
+                val key = "${shapeCounter % 5};${moveCounter % jetPattern.length}"
+                if (patterns.contains(key) && shapeCounter > 10_000) {
+                    val (prevHighestLine, prevShapeCount) = patterns[key]!!
+                    val deltaHighestLine = highestLine - prevHighestLine
+                    val deltaShapeCount = shapeCounter - prevShapeCount
+                    while (shapeCounter < maxShapes - deltaShapeCount) {
+                        shapeCounter += deltaShapeCount
+                        highestLine += deltaHighestLine
+                    }
+                    (0L..6).forEach { restingRocks.add(Point(it, highestLine)) }
+                } else {
+                    patterns[key] = Pair(highestLine, shapeCounter)
+                }
             }
         }
+
+        return restingRocks.maxOf { it.y }
+    }
+
+    private fun nextMove(moveCounter: Long, jetPattern: String): Char {
+        val i: Int = (moveCounter % jetPattern.length).toInt()
+        return jetPattern[i]
     }
 
     private fun nextShape(n: Long, start: Point): Set<Point> {
@@ -99,9 +116,9 @@ object PyroclasticFlow : Solution {
         }
     }
 
-    private fun fall(rock: Set<Point>, resting: Set<Point>): Pair<Boolean, Set<Point>> {
+    private fun fall(rock: Set<Point>, resting: Set<Point>, baseLine: Long): Pair<Boolean, Set<Point>> {
         val movedRock = rock.map { it.copy(y = it.y - 1) }.toSet()
-        return if (movedRock.all { it.y > 0 && !resting.contains(it) }) {
+        return if (movedRock.all { it.y > baseLine && !resting.contains(it) }) {
             Pair(true, movedRock)
         } else {
             Pair(false, rock)
