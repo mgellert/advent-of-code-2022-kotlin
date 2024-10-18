@@ -28,3 +28,4 @@ build
 .idea
 
 !gradle/wrapper/gradle-wrapper.jar
+/src/main/resources/inputs/
