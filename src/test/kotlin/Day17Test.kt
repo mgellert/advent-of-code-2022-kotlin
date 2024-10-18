@@ -15,6 +15,12 @@ class Day17Test {
         assertEquals(3081, height)
     }
 
+    @Test
+    fun `should solve day 17 part 2`() {
+        val height = PyroclasticFlow.heightOfRocks(input, 1000000000000)
+        assertEquals(1524637681145, height)
+    }
+
     companion object {
         private val input by lazy { PyroclasticFlow.jetPatterns() }
         const val TEST_INPUT = ">>><<><>><<<>><>>><<<>>><<<><<<>><>><<>>"
