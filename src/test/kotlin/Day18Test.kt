@@ -15,6 +15,18 @@ class Day18Test {
         assertEquals(4400, surfaceArea)
     }
 
+    @Test
+    fun `should calculate the exterior surface area of droplets`() {
+        val surfaceArea = BoilingBoulders.externalSurfaceArea(TEST_INPUT)
+        assertEquals(58, surfaceArea)
+    }
+
+    @Test
+    fun `should solve day 18 part 2`() {
+        val surfaceArea = BoilingBoulders.externalSurfaceArea(input)
+        assertEquals(2522, surfaceArea)
+    }
+
     companion object {
         private val input by lazy { BoilingBoulders.readDroplets() }
 
