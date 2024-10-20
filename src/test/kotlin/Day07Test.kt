@@ -15,6 +15,18 @@ class Day07Test {
         assertEquals(1749646, size)
     }
 
+    @Test
+    fun `should calculate the smallest dir that can be deleted`() {
+        val size = NoSpaceLeftOnDevice.deleteLargestDir(TEST_INPUT)
+        assertEquals(24933642, size)
+    }
+
+    @Test
+    fun `should solve day 7 part 2`() {
+        val size = NoSpaceLeftOnDevice.deleteLargestDir(input)
+        assertEquals(1498966, size)
+    }
+
     companion object {
         private val input by lazy { NoSpaceLeftOnDevice.readCommands() }
         private val TEST_INPUT = """
