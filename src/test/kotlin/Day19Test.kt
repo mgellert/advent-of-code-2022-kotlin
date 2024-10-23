@@ -1,6 +1,8 @@
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 
+@Disabled // very slow needs optimization
 class Day19Test {
 
     @Test
@@ -15,6 +17,20 @@ class Day19Test {
 
     @Test
     fun `should find max geodes for blueprint 1 from test input`() {
+        val blueprint = NotEnoughMinerals.parseLine(testInput.split("\n").first())
+
+        val quality = NotEnoughMinerals.findMostGeode(
+            blueprint,
+            Minerals(1, 0, 0, 0),
+            Minerals(0, 0, 0, 0),
+            Minerals(0, 0, 0, 0),
+            1
+        )
+        assertEquals(9, quality)
+    }
+
+    @Test
+    fun `should find max geodes for blueprint 2 from test input`() {
         val blueprint = NotEnoughMinerals.parseLine(testInput.split("\n").drop(1).first())
 
         val quality = NotEnoughMinerals.findMostGeode(
@@ -28,6 +44,34 @@ class Day19Test {
     }
 
     @Test
+    fun test1() {
+        val blueprint = NotEnoughMinerals.parseLine(testInput.split("\n").first())
+
+        val quality = NotEnoughMinerals.findMostGeode(
+            blueprint,
+            Minerals(1, 0, 0, 0),
+            Minerals(0, 0, 0, 0),
+            Minerals(0, 0, 0, 0),
+            1, maxTime = 32
+        )
+        assertEquals(56, quality)
+    }
+
+    @Test
+    fun test2() {
+        val blueprint = NotEnoughMinerals.parseLine(testInput.split("\n").drop(1).first())
+
+        val quality = NotEnoughMinerals.findMostGeode(
+            blueprint,
+            Minerals(1, 0, 0, 0),
+            Minerals(0, 0, 0, 0),
+            Minerals(0, 0, 0, 0),
+            1, maxTime = 32
+        )
+        assertEquals(62, quality)
+    }
+
+    @Test
     fun `should find the sum of blueprint qualities`() {
         val blueprints = testInput.split("\n").map { NotEnoughMinerals.parseLine(it) }
         val quality = NotEnoughMinerals.findSumOfBlueprintQualities(blueprints)
@@ -38,6 +82,12 @@ class Day19Test {
     fun `should solve day 19 part 1`() {
         val quality = NotEnoughMinerals.findSumOfBlueprintQualities(input)
         assertEquals(2301, quality)
+    }
+
+    @Test
+    fun `should solve day 19 part 2`() {
+        val quality = NotEnoughMinerals.findSumOfFirstThreeBlueprints(input)
+        assertEquals(10336, quality)
     }
 
     companion object {

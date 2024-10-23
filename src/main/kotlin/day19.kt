@@ -16,7 +16,7 @@ object NotEnoughMinerals : Solution {
 
     fun findSumOfBlueprintQualities(blueprints: List<Blueprint>): Int {
         return blueprints.sumOf { blueprint ->
-            findMostGeode(
+            blueprint.id * findMostGeode(
                 blueprint,
                 Minerals(1, 0, 0, 0),
                 Minerals(0, 0, 0, 0),
@@ -24,98 +24,128 @@ object NotEnoughMinerals : Solution {
                 1
             )
         }
+
     }
 
-    fun findMostGeode(blueprint: Blueprint, robots: Minerals, factory: Minerals, minerals: Minerals, time: Int): Int {
+    fun findSumOfFirstThreeBlueprints(blueprints: List<Blueprint>): Int {
+        return blueprints.take(3).map { blueprint ->
+            findMostGeode(
+                blueprint,
+                Minerals(1, 0, 0, 0),
+                Minerals(0, 0, 0, 0),
+                Minerals(0, 0, 0, 0),
+                1, 32
+            )
+        }.onEach { println(it) }
+        .reduce(Int::times)
+    }
+
+    fun findMostGeode(
+        blueprint: Blueprint,
+        robots: Minerals,
+        factory: Minerals,
+        minerals: Minerals,
+        time: Int,
+        maxTime: Int = 24
+    ): Int {
         val minedMinerals = minerals + robots
 
-        if (time == 24) {
-            return minedMinerals.geode * blueprint.id
+        if (time == maxTime) {
+            return minedMinerals.geode
         }
 
         val availableRobots = robots + factory
 
         val geodes = mutableSetOf<Int>()
-        if (buildOreRobot(blueprint, minedMinerals)) {
+
+        val lastMinute = maxTime - time == 1
+        val buildOreRobot = !lastMinute && buildOreRobot(blueprint, minedMinerals, availableRobots)
+        val buildClayRobot = !lastMinute && buildClayRobot(blueprint, minedMinerals, availableRobots)
+        val buildObsidianRobot = !lastMinute && buildObsidianRobot(blueprint, minedMinerals, availableRobots)
+        val buildGeodeRobot = !lastMinute && buildGeodeRobot(blueprint, minedMinerals, availableRobots)
+
+        if (!buildGeodeRobot && buildOreRobot) {
             geodes.add(
                 findMostGeode(
                     blueprint,
                     availableRobots,
                     Minerals(1, 0, 0, 0),
                     minedMinerals - blueprint.oreRobotCost,
-                    time + 1
+                    time + 1, maxTime
                 )
             )
         }
 
-        if (buildClayRobot(blueprint, minedMinerals)) {
+        if (!buildGeodeRobot && buildClayRobot) {
             geodes.add(
                 findMostGeode(
                     blueprint,
                     availableRobots,
                     Minerals(0, 1, 0, 0),
                     minedMinerals - blueprint.clayRobotCost,
-                    time + 1
+                    time + 1, maxTime
                 )
             )
         }
 
-        if (buildObsidianRobot(blueprint, minedMinerals)) {
+        if (!buildGeodeRobot && buildObsidianRobot) {
             geodes.add(
                 findMostGeode(
                     blueprint,
                     availableRobots,
                     Minerals(0, 0, 1, 0),
                     minedMinerals - blueprint.obsidianRobotCost,
-                    time + 1
+                    time + 1, maxTime
                 )
             )
         }
 
-        if (buildGeodeRobot(blueprint, minedMinerals)) {
+        if (buildGeodeRobot) {
             geodes.add(
                 findMostGeode(
                     blueprint,
                     availableRobots,
                     Minerals(0, 0, 0, 1),
                     minedMinerals - blueprint.geodeRobotCost,
-                    time + 1
+                    time + 1, maxTime
                 )
             )
         }
 
-        // do nothing
         geodes.add(
             findMostGeode(
                 blueprint,
                 availableRobots,
                 Minerals(0, 0, 0, 0),
-                minedMinerals, time + 1
+                minedMinerals, time + 1, maxTime
             )
         )
 
         return geodes.maxOrNull() ?: 0
     }
 
-    private fun buildGeodeRobot(blueprint: Blueprint, minerals: Minerals): Boolean {
+    private fun buildGeodeRobot(blueprint: Blueprint, minerals: Minerals, robots: Minerals): Boolean {
         return minerals.ore >= blueprint.geodeRobotCost.ore && minerals.obsidian >= blueprint.geodeRobotCost.obsidian
     }
 
-    private fun buildObsidianRobot(blueprint: Blueprint, minerals: Minerals): Boolean {
+    private fun buildObsidianRobot(blueprint: Blueprint, minerals: Minerals, robots: Minerals): Boolean {
         return minerals.ore >= blueprint.obsidianRobotCost.ore && minerals.clay >= blueprint.obsidianRobotCost.clay
-                && minerals.obsidian <= blueprint.maxObsidianNeeded()
+                && minerals.obsidian <= blueprint.maxObsidianNeeded() * 1.4
+                && robots.obsidian <= blueprint.maxObsidianNeeded()
     }
 
-    private fun buildClayRobot(blueprint: Blueprint, minerals: Minerals): Boolean {
+    private fun buildClayRobot(blueprint: Blueprint, minerals: Minerals, robots: Minerals): Boolean {
         return minerals.ore >= blueprint.clayRobotCost.ore
-                && minerals.clay <= blueprint.maxClayNeeded()
+                && minerals.clay <= blueprint.maxClayNeeded() * 1.4
+                && robots.clay <= blueprint.maxClayNeeded()
     }
 
-    private fun buildOreRobot(blueprint: Blueprint, minerals: Minerals): Boolean {
+    private fun buildOreRobot(blueprint: Blueprint, minerals: Minerals, robots: Minerals): Boolean {
         return minerals.ore >= blueprint.oreRobotCost.ore
-                && minerals.ore <= blueprint.maxOreNeeded()
-    }
+                && minerals.ore <= blueprint.maxOreNeeded() * 1.4
+                && robots.ore <= blueprint.maxOreNeeded()
 
+    }
 
 }
 
