@@ -15,6 +15,17 @@ class Day21Test {
         assertEquals(331120084396440, root)
     }
 
+    @Test
+    fun test2() {
+        val root = MonkeyMath.calculateEqualityTest(testInput)
+        assertEquals(301, root)
+    }
+
+    @Test
+    fun `should solve day21 part 2`() {
+        val root = MonkeyMath.calculateEqualityTest(input)
+        assertEquals(3378273370680, root)
+    }
 
     companion object {
         private val input by lazy { MonkeyMath.readMonkeys() }
