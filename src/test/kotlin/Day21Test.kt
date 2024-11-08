@@ -17,13 +17,13 @@ class Day21Test {
 
     @Test
     fun test2() {
-        val root = MonkeyMath.calculateEqualityTest(testInput)
+        val root = MonkeyMath.calculateNumberToYell(testInput)
         assertEquals(301, root)
     }
 
     @Test
     fun `should solve day21 part 2`() {
-        val root = MonkeyMath.calculateEqualityTest(input)
+        val root = MonkeyMath.calculateNumberToYell(input)
         assertEquals(3378273370680, root)
     }
 

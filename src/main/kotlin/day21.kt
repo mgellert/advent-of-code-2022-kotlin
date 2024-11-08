@@ -18,53 +18,36 @@ object MonkeyMath : Solution {
         }
     }
 
-    fun calculateEqualityTest(monkeys: Map<String, String>): Long {
+    fun calculateNumberToYell(monkeys: Map<String, String>): Long {
         val value = monkeys["root"]!!
         val (monkey1, _, monkey2) = value.split(" ")
 
-        val branch1 = hasHuman(monkeys, monkey1)
-
-        val num = if (branch1) {
-            calculateRoot(monkeys, monkey2)
-        } else {
-            calculateRoot(monkeys, monkey1)
-        }
-
-        return if (branch1) {
-            equality(monkeys, monkey1, num)
-        } else {
-            equality(monkeys, monkey2, num)
-        }
+        val (humanBranch, monkeyBranch) = if (hasHuman(monkeys, monkey1)) Pair(monkey1, monkey2) else Pair(monkey2, monkey1)
+        val rootNumber = calculateRoot(monkeys, monkeyBranch)
+        val (_, numberToYell) = calculateHumanNumber(monkeys, humanBranch, rootNumber)
+        return numberToYell
     }
 
-    private fun equality(monkeys: Map<String, String>, monkey: String, neededNumber: Long): Long {
+    private fun calculateHumanNumber(monkeys: Map<String, String>, monkey: String, neededNumber: Long): Pair<Long, Long> {
         if (monkey == "humn") {
-            println(neededNumber)
+            return Pair(-1, neededNumber)
         }
+
         val value = monkeys[monkey]!!
         if (value.matches(numRegex)) {
-            return value.toLong()
+            return Pair(value.toLong(), -1)
         }
 
         val (monkey1, operator, monkey2) = value.split(" ")
-        val branch1 = hasHuman(monkeys, monkey1)
-        val num = if (branch1) {
-            calculateRoot(monkeys, monkey2)
-        } else {
-            calculateRoot(monkeys, monkey1)
-        }
-
-        val m = if (branch1) {
-            monkey1
-        } else {
-            monkey2
-        }
+        val branch1HasHuman = hasHuman(monkeys, monkey1)
+        val (humanBranch, monkeyBranch) = if (branch1HasHuman) Pair(monkey1, monkey2) else Pair(monkey2, monkey1)
+        val rootNumber = calculateRoot(monkeys, monkeyBranch)
 
         return when (operator) {
-            "+" -> equality(monkeys, m, neededNumber - num)
-            "-" -> equality(monkeys, m, if (branch1) neededNumber + num else num - neededNumber )
-            "*" -> equality(monkeys, m, neededNumber / num )
-            "/" -> equality(monkeys, m, if (branch1) neededNumber * num else num / neededNumber )
+            "+" -> calculateHumanNumber(monkeys, humanBranch, neededNumber - rootNumber)
+            "-" -> calculateHumanNumber(monkeys, humanBranch, if (branch1HasHuman) neededNumber + rootNumber else rootNumber - neededNumber )
+            "*" -> calculateHumanNumber(monkeys, humanBranch, neededNumber / rootNumber )
+            "/" -> calculateHumanNumber(monkeys, humanBranch, if (branch1HasHuman) neededNumber * rootNumber else rootNumber / neededNumber )
             else -> throw IllegalStateException()
         }
     }
@@ -79,7 +62,7 @@ object MonkeyMath : Solution {
             return false
         }
 
-        val (monkey1, operator, monkey2) = value.split(" ")
+        val (monkey1, _, monkey2) = value.split(" ")
         return hasHuman(monkeys, monkey1) || hasHuman(monkeys, monkey2)
     }
 
